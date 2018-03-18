@@ -3,12 +3,12 @@ package pl.lodz.p.pl;
 import java.util.*;
 
 public class SudokuBoard {
-    private static final int boardWidth = 9;
+    public static final int boardWidth = 9;
     private int[][] board = new int[boardWidth][boardWidth];
     //private Integer[] cellOrder = new Integer[81];
 
     public SudokuBoard() {
-        List<Integer> rowValues = new ArrayList<Integer>();
+        List<Integer> rowValues = new ArrayList<>();
         for (int i = 1; i < boardWidth + 1; i++) {
             rowValues.add(i);
         }
@@ -31,6 +31,32 @@ public class SudokuBoard {
         }
 
         return copy;
+    }
+
+    public void setBoardValuesAt(final IntPair index, int newValue) throws IllegalArgumentException {
+        if (newValue > 0 && newValue < boardWidth + 1) {
+            if (index.First >= 0 && index.First < boardWidth && index.Second >= 0 && index.Second < 10) {
+                board[index.First][index.Second] = newValue;
+            } else {
+                throw new IllegalArgumentException("Bad index");
+            }
+        } else {
+            throw new IllegalArgumentException("Wrong value to set");
+        }
+
+    }
+
+    public void setBoardValuesAt(int rowIndex, int columnIndex, int newValue) throws IllegalArgumentException {
+        if (newValue >= 0 && newValue < boardWidth + 1) {
+            if (rowIndex >= 0 && rowIndex < boardWidth && columnIndex >= 0 && columnIndex < boardWidth) {
+                board[rowIndex][columnIndex] = newValue;
+            } else {
+                throw new IllegalArgumentException("Bad index");
+            }
+        } else {
+            throw new IllegalArgumentException("Wrong value to set");
+        }
+
     }
 
     public void consoleShow() {
@@ -60,23 +86,7 @@ public class SudokuBoard {
         }
     }
 
-    public boolean fill() {
-        return solve(new BoardElement(0, 0));
-    }
-
-    private static class BoardElement {
-
-        int row, col;
-
-        public BoardElement(int row, int col) {
-            super();
-            this.row = row;
-            this.col = col;
-        }
-
-    }
-
-    private boolean isValid(final BoardElement boardElement, int value) {
+    public boolean isValid(final BoardElement boardElement, int value) {
         //region columns
         for (int c = 0; c < 9; c++) {
             if (board[boardElement.row][c] == value) {
@@ -109,7 +119,19 @@ public class SudokuBoard {
         return true;
     }
 
-    private BoardElement getNextBoardElement(final BoardElement cur) {
+    public static class BoardElement {
+
+        int row, col;
+
+        public BoardElement(int row, int col) {
+            super();
+            this.row = row;
+            this.col = col;
+        }
+
+    }
+
+    public SudokuBoard.BoardElement getNextBoardElement(final SudokuBoard.BoardElement cur) {
 
         int row = cur.row;
         int col = cur.col;
@@ -124,45 +146,7 @@ public class SudokuBoard {
             return null;
         }
 
-        BoardElement next = new BoardElement(row, col);
+        SudokuBoard.BoardElement next = new SudokuBoard.BoardElement(row, col);
         return next;
-    }
-
-    private boolean solve(final BoardElement cur) {
-
-        if (cur == null) {
-            return true;
-        }
-
-        //if not zero, then already filled
-        if (board[cur.row][cur.col] != 0) {
-            return solve(getNextBoardElement(cur));
-        }
-
-        for (int i = 1; i <= 9; i++) {
-
-            boolean valid = isValid(cur, i);
-
-            if (!valid) { // i not valid for this cell, try other values
-                continue;
-            }
-
-            board[cur.row][cur.col] = i;
-            boolean solved = solve(getNextBoardElement(cur));
-            if (solved) {
-                return true;
-            } else {
-                board[cur.row][cur.col] = 0; // reset
-            }
-            // continue with other values
-        }
-        return false;
-    }
-
-    private IntPair convertIndex(final Integer oneDIndex) {
-        IntPair pair = new IntPair();
-        pair.First = oneDIndex / boardWidth;
-        pair.Second = oneDIndex % boardWidth;
-        return pair;
     }
 }

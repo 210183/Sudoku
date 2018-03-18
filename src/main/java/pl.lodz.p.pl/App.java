@@ -5,10 +5,12 @@ public class App {
         System.out.println("Sudoku Board");
         boolean result = false;
         SudokuBoard someBoard;
+        BacktrackingSudokuSolver solver = new BacktrackingSudokuSolver();
 
         try {
             someBoard = new SudokuBoard();
-            result = someBoard.fill();
+
+            result = solver.solve(someBoard);
             someBoard.consoleShow();
 
             System.out.println("result: " + result + " ");
