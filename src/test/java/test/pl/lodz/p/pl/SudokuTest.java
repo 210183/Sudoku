@@ -2,6 +2,7 @@ package test.pl.lodz.p.pl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.Test;
 import pl.lodz.p.pl.BacktrackingSudokuSolver;
@@ -23,6 +24,17 @@ public class SudokuTest {
         solver.solve(secondBoard);
         validate(secondBoard);
         assert (!Equals(firstBoard.getBoard(), secondBoard.getBoard())); //should randomize two different boards
+    }
+
+    @Test
+    public void BoardConsoleShow_ShouldDisplayCorrectBoard_Test()
+    {
+        pl.lodz.p.pl.SudokuBoard firstBoard = new pl.lodz.p.pl.SudokuBoard();
+        BacktrackingSudokuSolver solver = new BacktrackingSudokuSolver();
+        solver.solve(firstBoard);
+        firstBoard.consoleShow();
+        //if execution reached assert below, assuming it;s ok
+        assertTrue(true);
     }
 
     private boolean validate(SudokuBoard sudoku) {

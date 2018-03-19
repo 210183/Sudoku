@@ -33,18 +33,18 @@ public class SudokuBoard {
         return copy;
     }
 
-    public void setBoardValuesAt(final IntPair index, int newValue) throws IllegalArgumentException {
-        if (newValue > 0 && newValue < boardWidth + 1) {
-            if (index.First >= 0 && index.First < boardWidth && index.Second >= 0 && index.Second < 10) {
-                board[index.First][index.Second] = newValue;
-            } else {
-                throw new IllegalArgumentException("Bad index");
-            }
-        } else {
-            throw new IllegalArgumentException("Wrong value to set");
-        }
-
-    }
+//    public void setBoardValuesAt(final IntPair index, int newValue) throws IllegalArgumentException {
+//        if (newValue > 0 && newValue < boardWidth + 1) {
+//            if (index.First >= 0 && index.First < boardWidth && index.Second >= 0 && index.Second < 10) {
+//                board[index.First][index.Second] = newValue;
+//            } else {
+//                throw new IllegalArgumentException("Bad index");
+//            }
+//        } else {
+//            throw new IllegalArgumentException("Wrong value to set");
+//        }
+//
+//    }
 
     public void setBoardValuesAt(int rowIndex, int columnIndex, int newValue) throws IllegalArgumentException {
         if (newValue >= 0 && newValue < boardWidth + 1) {
