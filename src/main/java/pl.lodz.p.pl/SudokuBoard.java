@@ -1,74 +1,74 @@
 package pl.lodz.p.pl;
 
+import javax.swing.*;
 import java.util.*;
 
+import static pl.lodz.p.pl.SudokuConstants.*;
+
 public class SudokuBoard {
-    public static final int boardWidth = 9;
-    private int[][] board = new int[boardWidth][boardWidth];
-    //private Integer[] cellOrder = new Integer[81];
+
+    private SudokuField[][] board = new SudokuField[boardSize][boardSize];
+    private SudokuRow[] rows = new SudokuRow[boardSize];
+    private SudokuColumn[] columns = new SudokuColumn[boardSize];
+    private SudokuBox[] boxes = new SudokuBox[boardSize];
 
     public SudokuBoard() {
-        List<Integer> rowValues = new ArrayList<>();
-        for (int i = 1; i < boardWidth + 1; i++) {
-            rowValues.add(i);
+        // init SudokuField
+        for (int i = 0; i < boardSize; i++) {
+            rows[i] = new SudokuRow();
+            columns[i] = new SudokuColumn();
+            boxes[i] = new SudokuBox();
+            for (int j = 0; j < boardSize; j++) {
+                board[i][j] = new SudokuField(0);
+            }
+        }
+        //
+        List<SudokuField> rowValues = new ArrayList<>();
+        for (int i = 1; i < boardSize + 1; i++) {
+            rowValues.add(new SudokuField(i));
         }
         Collections.shuffle(rowValues);
-        int[] row = rowValues.stream()
-                .mapToInt(Integer::intValue)
-                .toArray();
-        for (int i = 0; i < boardWidth; i++) {
-            board[0][i] = row[i];
+        SudokuField[] row = new SudokuField[boardSize];
+        for (int i = 0; i < boardSize; i++) {
+            board[0][i] = rowValues.get(i);
         }
-
     }
 
-    public int[][] getBoard() {
-        int[][] copy = new int[9][9];
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
+    public SudokuField[][] getBoard() {
+        SudokuField[][] copy = new SudokuField[boardSize][boardSize];
+        for (int i = 0; i < boardSize; i++) {
+            for (int j = 0; j < boardSize; j++) {
                 copy[i][j] = board[i][j];
             }
         }
-
         return copy;
     }
 
-//    public void setBoardValuesAt(final IntPair index, int newValue) throws IllegalArgumentException {
-//        if (newValue > 0 && newValue < boardWidth + 1) {
-//            if (index.First >= 0 && index.First < boardWidth && index.Second >= 0 && index.Second < 10) {
-//                board[index.First][index.Second] = newValue;
-//            } else {
-//                throw new IllegalArgumentException("Bad index");
-//            }
-//        } else {
-//            throw new IllegalArgumentException("Wrong value to set");
-//        }
-//
-//    }
-
-    public void setBoardValuesAt(int rowIndex, int columnIndex, int newValue) throws IllegalArgumentException {
-        if (newValue >= 0 && newValue < boardWidth + 1) {
-            if (rowIndex >= 0 && rowIndex < boardWidth && columnIndex >= 0 && columnIndex < boardWidth) {
-                board[rowIndex][columnIndex] = newValue;
+    public void setBoardValueAt(int rowIndex, int columnIndex, int newValue) throws IllegalArgumentException {
+        if (isFieldValueInBounds(newValue)) {
+            if (isIndexInBounds(rowIndex) && isIndexInBounds(columnIndex)) {
+                board[rowIndex][columnIndex].setValue(newValue);
+                rows[rowIndex].setValue(columnIndex, newValue);
+                columns[columnIndex].setValue(rowIndex, newValue);
+                setBoxValueForIndexes(rowIndex, columnIndex, newValue);
             } else {
                 throw new IllegalArgumentException("Bad index");
             }
         } else {
             throw new IllegalArgumentException("Wrong value to set");
         }
-
     }
 
     public void consoleShow() {
         int rowCounter = 0;
         int colCounter = 0;
-        for (int i = 0; i < boardWidth; i++) {
-            for (int j = 0; j < boardWidth; j++) {
+        for (int i = 0; i < boardSize; i++) {
+            for (int j = 0; j < boardSize; j++) {
                 if (colCounter == 2) {
-                    System.out.print(board[i][j] + " | ");
+                    System.out.print(board[i][j].getValue() + " | ");
                     colCounter = 0;
                 } else {
-                    System.out.print(board[i][j] + " ");
+                    System.out.print(board[i][j].getValue() + " ");
                     colCounter++;
                 }
             }
@@ -86,44 +86,30 @@ public class SudokuBoard {
         }
     }
 
-    public boolean isValid(final BoardElement boardElement, int value) {
-        //region columns
-        for (int c = 0; c < 9; c++) {
-            if (board[boardElement.row][c] == value) {
-                return false;
-            }
-        }
-        //endregion
-        // region rows
-        for (int r = 0; r < 9; r++) {
-            if (board[r][boardElement.col] == value) {
-                return false;
-            }
-        }
-        //endregion
-        //region squares
-        int x1 = 3 * (boardElement.row / 3);
-        int y1 = 3 * (boardElement.col / 3);
-        int x2 = x1 + 2;
-        int y2 = y1 + 2;
-
-        for (int x = x1; x <= x2; x++) {
-            for (int y = y1; y <= y2; y++) {
-                if (board[x][y] == value) {
+    public boolean isValid(final BoardIndex boardIndex, int value) {
+        int row = boardIndex.row;
+        int col = boardIndex.col;
+        if (columns[col].verify(value)) {
+            if (rows[row].verify(value)) {
+                int boxIndex = getBoxNumberForIndexes(row, col);
+                if (boxes[boxIndex].verify(value)) {
+                    return true;
+                } else {
                     return false;
                 }
+            } else {
+                return false;
             }
+        } else {
+            return false;
         }
-        //endregion
-        // if reached here, value is correct
-        return true;
     }
 
-    public static class BoardElement {
+    public static class BoardIndex {
 
         int row, col;
 
-        public BoardElement(int row, int col) {
+        public BoardIndex(int row, int col) {
             super();
             this.row = row;
             this.col = col;
@@ -131,22 +117,38 @@ public class SudokuBoard {
 
     }
 
-    public SudokuBoard.BoardElement getNextBoardElement(final SudokuBoard.BoardElement cur) {
+    public BoardIndex getNextBoardIndex(final BoardIndex cur) {
 
         int row = cur.row;
         int col = cur.col;
 
         col++;
-        if (col > 8) {
+        if (col >= boardSize) {
             col = 0;
             row++;
         }
 
-        if (row > 8) {
+        if (row >= boardSize) {
             return null;
         }
 
-        SudokuBoard.BoardElement next = new SudokuBoard.BoardElement(row, col);
+        BoardIndex next = new BoardIndex(row, col);
         return next;
+    }
+
+    public BoxIndex getBoxIndexForIndexes(int rowIndex, int colIndex) {
+        int boxRowIndex = rowIndex % 3;
+        int boxColumnIndex = colIndex % 3;
+        return new BoxIndex(boxRowIndex, boxColumnIndex);
+    }
+
+    private void setBoxValueForIndexes(int rowIndex, int colIndex, int value) {
+        int boxNumber = getBoxNumberForIndexes(rowIndex, colIndex);
+        BoxIndex boxIndex = getBoxIndexForIndexes(rowIndex, colIndex);
+        boxes[boxNumber].setValue(boxIndex.getRow(), boxIndex.getCol(), value);
+    }
+
+    public int getBoxNumberForIndexes(int rowIndex, int colIndex) {
+        return colIndex / 3 + (rowIndex / 3) * 3;
     }
 }

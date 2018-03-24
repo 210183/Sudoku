@@ -3,10 +3,12 @@ package test.pl.lodz.p.pl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static pl.lodz.p.pl.SudokuConstants.boardSize;
 
 import org.junit.Test;
 import pl.lodz.p.pl.BacktrackingSudokuSolver;
 import pl.lodz.p.pl.SudokuBoard;
+import pl.lodz.p.pl.SudokuField;
 
 import java.util.Arrays;
 
@@ -15,12 +17,12 @@ public class SudokuTest {
 
     @Test
     public void CreateProperSudokuBoard_Test() {
-        pl.lodz.p.pl.SudokuBoard firstBoard = new pl.lodz.p.pl.SudokuBoard();
+        SudokuBoard firstBoard = new SudokuBoard();
         BacktrackingSudokuSolver solver = new BacktrackingSudokuSolver();
         solver.solve(firstBoard);
         validate(firstBoard);
 
-        pl.lodz.p.pl.SudokuBoard secondBoard = new pl.lodz.p.pl.SudokuBoard();
+        SudokuBoard secondBoard = new SudokuBoard();
         solver.solve(secondBoard);
         validate(secondBoard);
         assert (!Equals(firstBoard.getBoard(), secondBoard.getBoard())); //should randomize two different boards
@@ -29,7 +31,7 @@ public class SudokuTest {
     @Test
     public void BoardConsoleShow_ShouldDisplayCorrectBoard_Test()
     {
-        pl.lodz.p.pl.SudokuBoard firstBoard = new pl.lodz.p.pl.SudokuBoard();
+        SudokuBoard firstBoard = new SudokuBoard();
         BacktrackingSudokuSolver solver = new BacktrackingSudokuSolver();
         solver.solve(firstBoard);
         firstBoard.consoleShow();
@@ -38,40 +40,38 @@ public class SudokuTest {
     }
 
     private boolean validate(SudokuBoard sudoku) {
-        boolean[] isNumberAlreadyFound = new boolean[boardWidth + 1]; // from 0 - 9, cause zero means not filled yet
+        boolean[] isNumberAlreadyFound = new boolean[boardSize + 1]; // from 0 - 9, cause zero means not filled yet
         //region check rows
-        for (int line = 0; line < boardWidth; line++) {
+        for (int line = 0; line < boardSize; line++) {
             Arrays.fill(isNumberAlreadyFound, false);
-            for (int cell = 0; cell < boardWidth; cell++) {
-                if (sudoku.getBoard()[line][cell] != 0) {
-                    if (isNumberAlreadyFound[sudoku.getBoard()[line][cell]]) {
+            for (int cell = 0; cell < boardSize; cell++) {
+                if (sudoku.getBoard()[line][cell].getValue() != 0) {
+                    if (isNumberAlreadyFound[sudoku.getBoard()[line][cell].getValue()]) {
                         return false;
                     } else {
-                        isNumberAlreadyFound[sudoku.getBoard()[line][cell]] = true;
+                        isNumberAlreadyFound[sudoku.getBoard()[line][cell].getValue()] = true;
                     }
                 }
             }
-
         }
         //endregion
         //region check column
-        for (int column = 0; column < boardWidth; column++) {
+        for (int column = 0; column < boardSize; column++) {
             Arrays.fill(isNumberAlreadyFound, false);
-            for (int cell = 0; cell < boardWidth; cell++) {
-                if (sudoku.getBoard()[cell][column] != 0) {
-                    if (isNumberAlreadyFound[sudoku.getBoard()[cell][column]]) {
+            for (int cell = 0; cell < boardSize; cell++) {
+                if (sudoku.getBoard()[cell][column].getValue() != 0) {
+                    if (isNumberAlreadyFound[sudoku.getBoard()[cell][column].getValue()]) {
                         return false;
                     } else {
-                        isNumberAlreadyFound[sudoku.getBoard()[cell][column]] = true;
+                        isNumberAlreadyFound[sudoku.getBoard()[cell][column].getValue()] = true;
                     }
                 }
             }
-
         }
         //endregion
         //region check squares
-        for (int i = 0; i < boardWidth; i += 3) {
-            for (int j = 0; j < boardWidth; j += 3) {
+        for (int i = 0; i < boardSize; i += 3) {
+            for (int j = 0; j < boardSize; j += 3) {
                 if (!checkSquare(sudoku, i, j)) {
                     return false;
                 }
@@ -82,14 +82,14 @@ public class SudokuTest {
     }
 
     private boolean checkSquare(SudokuBoard sudoku, int startingRowIndex, int startingColIndex) {
-        boolean[] isNumberAlreadyFound = new boolean[boardWidth + 1];
+        boolean[] isNumberAlreadyFound = new boolean[boardSize + 1];
         for (int i = startingRowIndex; i < startingRowIndex + 3; i++) {
             for (int j = startingColIndex; j < startingColIndex + 3; j++) {
-                if (sudoku.getBoard()[i][j] != 0) {
-                    if (isNumberAlreadyFound[sudoku.getBoard()[i][j]]) {
+                if (sudoku.getBoard()[i][j].getValue() != 0) {
+                    if (isNumberAlreadyFound[sudoku.getBoard()[i][j].getValue()]) {
                         return false;
                     } else {
-                        isNumberAlreadyFound[sudoku.getBoard()[i][j]] = true;
+                        isNumberAlreadyFound[sudoku.getBoard()[i][j].getValue()] = true;
                     }
                 }
             }
@@ -97,10 +97,13 @@ public class SudokuTest {
         return true;
     }
 
-    private boolean Equals(int[][] firstBoard, int[][] secondBoard) {
-        for (int i = 0; i < boardWidth; i++) {
-            for (int j = 0; j < boardWidth; j++) {
-                if (firstBoard[i][j] != secondBoard[i][j])
+    /*
+    Checks underlying int values in SudokuField (board[x][y].getValue())
+     */
+    private boolean Equals(SudokuField[][] firstBoard, SudokuField[][] secondBoard) {
+        for (int i = 0; i < boardSize; i++) {
+            for (int j = 0; j < boardSize; j++) {
+                if (firstBoard[i][j].getValue() != secondBoard[i][j].getValue())
                     return false;
             }
         }

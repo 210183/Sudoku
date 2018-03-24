@@ -1,23 +1,23 @@
 package pl.lodz.p.pl;
 
-import static pl.lodz.p.pl.SudokuBoard.boardWidth;
+import static pl.lodz.p.pl.SudokuConstants.boardSize;
 
 public class BacktrackingSudokuSolver implements SudokuSolver {
 
 
     public boolean solve(final SudokuBoard board) {
-        return solve(board, new SudokuBoard.BoardElement(0, 0));
+        return solve(board, new SudokuBoard.BoardIndex(0, 0));
     }
 
-    private boolean solve(final SudokuBoard board, final SudokuBoard.BoardElement cur) {
+    private boolean solve(final SudokuBoard board, final SudokuBoard.BoardIndex cur) {
 
         if (cur == null) {
             return true;
         }
 
         //if not zero, then already filled
-        if (board.getBoard()[cur.row][cur.col] != 0) {
-            return solve(board, board.getNextBoardElement(cur));
+        if (board.getBoard()[cur.row][cur.col].getValue() != 0) {
+            return solve(board, board.getNextBoardIndex(cur));
         }
 
         for (int i = 1; i <= 9; i++) {
@@ -28,12 +28,12 @@ public class BacktrackingSudokuSolver implements SudokuSolver {
                 continue;
             }
 
-            board.setBoardValuesAt(cur.row, cur.col, i);
-            boolean solved = solve(board, board.getNextBoardElement(cur));
+            board.setBoardValueAt(cur.row, cur.col, i);
+            boolean solved = solve(board, board.getNextBoardIndex(cur));
             if (solved) {
                 return true;
             } else {
-                board.setBoardValuesAt(cur.row, cur.col, 0); // reset
+                board.setBoardValueAt(cur.row, cur.col, 0); // reset
             }
             // continue with other values
         }
@@ -42,8 +42,8 @@ public class BacktrackingSudokuSolver implements SudokuSolver {
 
     private IntPair convertIndex(final Integer oneDIndex) {
         IntPair pair = new IntPair();
-        pair.First = oneDIndex / boardWidth;
-        pair.Second = oneDIndex % boardWidth;
+        pair.First = oneDIndex / boardSize;
+        pair.Second = oneDIndex % boardSize;
         return pair;
     }
 }
