@@ -40,10 +40,10 @@ public class BacktrackingSudokuSolver implements SudokuSolver {
         return false;
     }
 
-    private IntPair convertIndex(final Integer oneDIndex) {
-        IntPair pair = new IntPair();
-        pair.First = oneDIndex / boardSize;
-        pair.Second = oneDIndex % boardSize;
-        return pair;
-    }
+//    private IntPair convertIndex(final Integer oneDIndex) {
+//        IntPair pair = new IntPair();
+//        pair.First = oneDIndex / boardSize;
+//        pair.Second = oneDIndex % boardSize;
+//        return pair;
+//    }
 }

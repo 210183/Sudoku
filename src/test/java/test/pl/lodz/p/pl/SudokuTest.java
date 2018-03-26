@@ -9,6 +9,7 @@ import org.junit.Test;
 import pl.lodz.p.pl.BacktrackingSudokuSolver;
 import pl.lodz.p.pl.SudokuBoard;
 import pl.lodz.p.pl.SudokuField;
+import pl.lodz.p.pl.SudokuLine;
 
 import java.util.Arrays;
 
@@ -37,6 +38,17 @@ public class SudokuTest {
         firstBoard.consoleShow();
         //if execution reached assert below, assuming it;s ok
         assertTrue(true);
+    }
+
+    @Test
+    public void SudokuLine_getValues_Test()
+    {
+        int valueToSet = 5;
+        SudokuLine line = new SudokuLine();
+        line.setValue(2, valueToSet);
+        SudokuField[] fields = line.getValues();
+        assertEquals(fields[2].getValue(), valueToSet);
+        assertNotEquals(fields, line.getValues());
     }
 
     private boolean validate(SudokuBoard sudoku) {

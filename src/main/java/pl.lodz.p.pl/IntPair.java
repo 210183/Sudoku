@@ -1,5 +1,5 @@
 package pl.lodz.p.pl;
-
+/* Class used for old method to convert incedexes (one-dimensional - two-dimensional)
 public class IntPair {
     public int First;
     public int Second;
@@ -13,3 +13,4 @@ public class IntPair {
         Second = second;
     }
 }
+*/
