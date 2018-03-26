@@ -50,6 +50,17 @@ public class SudokuTest {
         assertEquals(fields[2].getValue(), valueToSet);
         assertNotEquals(fields, line.getValues());
     }
+    @Test(expected = IllegalArgumentException.class)
+    public void SudokuField_setBadValue_Test()
+    {
+      SudokuField field = new SudokuField(0);
+      field.setValue(10);
+    }
+    @Test(expected = IllegalArgumentException.class)
+    public void SudokuField_ConstructWithBadValue_Test()
+    {
+        SudokuField field = new SudokuField(-2);
+    }
 
     private boolean validate(SudokuBoard sudoku) {
         boolean[] isNumberAlreadyFound = new boolean[boardSize + 1]; // from 0 - 9, cause zero means not filled yet

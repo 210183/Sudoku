@@ -1,6 +1,6 @@
 package pl.lodz.p.pl;
 
-public final class SudokuConstants {
+public abstract class SudokuConstants {
     public static final int boardSize = 9;
 
     public static boolean isIndexInBounds(int value) {
