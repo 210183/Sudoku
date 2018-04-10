@@ -16,7 +16,7 @@ public class BacktrackingSudokuSolver implements SudokuSolver {
         }
 
         //if not zero, then already filled
-        if (board.getBoard()[cur.row][cur.col].getValue() != 0) {
+        if (board.getBoard().get(cur.row).get(cur.col).getValue() != 0) {
             return solve(board, board.getNextBoardIndex(cur));
         }
 

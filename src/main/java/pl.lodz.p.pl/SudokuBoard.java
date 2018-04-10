@@ -4,22 +4,27 @@ import javax.swing.*;
 import java.util.*;
 
 import static pl.lodz.p.pl.SudokuConstants.*;
+import static pl.lodz.p.pl.HelperMethods.*;
 
 public class SudokuBoard {
 
-    private SudokuField[][] board = new SudokuField[boardSize][boardSize];
-    private SudokuRow[] rows = new SudokuRow[boardSize];
-    private SudokuColumn[] columns = new SudokuColumn[boardSize];
-    private SudokuBox[] boxes = new SudokuBox[boardSize];
+    private List<FixedList> board = createTwoDimensionalList(boardSize, boardSize);
+    private List<SudokuRow> rows = Arrays.asList(new SudokuRow[boardSize]);
+    private List<SudokuColumn> columns = Arrays.asList(new SudokuColumn[boardSize]);
+    private List<SudokuBox> boxes = Arrays.asList(new SudokuBox[boardSize]);
+   // private SudokuField[][] board = new SudokuField[boardSize][boardSize];
+   // private SudokuRow[] rows = new SudokuRow[boardSize];
+   // private SudokuColumn[] columns = new SudokuColumn[boardSize];
+   // private SudokuBox[] boxes = new SudokuBox[boardSize];
 
     public SudokuBoard() {
         // init SudokuField
         for (int i = 0; i < boardSize; i++) {
-            rows[i] = new SudokuRow();
-            columns[i] = new SudokuColumn();
-            boxes[i] = new SudokuBox();
+            rows.set(i, new SudokuRow());
+            columns.set(i, new SudokuColumn());
+            boxes.set(i, new SudokuBox());
             for (int j = 0; j < boardSize; j++) {
-                board[i][j] = new SudokuField(0);
+                board.get(i).set(j, new SudokuField(0));
             }
         }
         //
@@ -30,15 +35,15 @@ public class SudokuBoard {
         Collections.shuffle(rowValues);
         SudokuField[] row = new SudokuField[boardSize];
         for (int i = 0; i < boardSize; i++) {
-            board[0][i] = rowValues.get(i);
+            board.get(0).set(i, rowValues.get(i));
         }
     }
 
-    public SudokuField[][] getBoard() {
-        SudokuField[][] copy = new SudokuField[boardSize][boardSize];
+    public List<FixedList> getBoard() {
+        List<FixedList> copy = createTwoDimensionalList(boardSize, boardSize);
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
-                copy[i][j] = board[i][j];
+                copy.get(i).set(j, board.get(i).get(j));
             }
         }
         return copy;
@@ -47,9 +52,9 @@ public class SudokuBoard {
     public void setBoardValueAt(int rowIndex, int columnIndex, int newValue) throws IllegalArgumentException {
         if (isFieldValueInBounds(newValue)) {
             if (isIndexInBounds(rowIndex) && isIndexInBounds(columnIndex)) {
-                board[rowIndex][columnIndex].setValue(newValue);
-                rows[rowIndex].setValue(columnIndex, newValue);
-                columns[columnIndex].setValue(rowIndex, newValue);
+                board.get(rowIndex).get(columnIndex).setValue(newValue);
+                rows.get(rowIndex).setValue(columnIndex, newValue);
+                columns.get(columnIndex).setValue(rowIndex, newValue);
                 setBoxValueForIndexes(rowIndex, columnIndex, newValue);
             } else {
                 throw new IllegalArgumentException("Bad index");
@@ -65,10 +70,10 @@ public class SudokuBoard {
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
                 if (colCounter == 2) {
-                    System.out.print(board[i][j].getValue() + " | ");
+                    System.out.print(board.get(i).get(j).getValue() + " | ");
                     colCounter = 0;
                 } else {
-                    System.out.print(board[i][j].getValue() + " ");
+                    System.out.print(board.get(i).get(j).getValue() + " ");
                     colCounter++;
                 }
             }
@@ -89,10 +94,10 @@ public class SudokuBoard {
     public boolean isValid(final BoardIndex boardIndex, int value) {
         int row = boardIndex.row;
         int col = boardIndex.col;
-        if (columns[col].verify(value)) {
-            if (rows[row].verify(value)) {
+        if (columns.get(col).verify(value)) {
+            if (rows.get(row).verify(value)) {
                 int boxIndex = getBoxNumberForIndexes(row, col);
-                if (boxes[boxIndex].verify(value)) {
+                if (boxes.get(boxIndex).verify(value)) {
                     return true;
                 } else {
                     return false;
@@ -145,7 +150,7 @@ public class SudokuBoard {
     private void setBoxValueForIndexes(int rowIndex, int colIndex, int value) {
         int boxNumber = getBoxNumberForIndexes(rowIndex, colIndex);
         BoxIndex boxIndex = getBoxIndexForIndexes(rowIndex, colIndex);
-        boxes[boxNumber].setValue(boxIndex.getRow(), boxIndex.getCol(), value);
+        boxes.get(boxNumber).setValue(boxIndex.getRow(), boxIndex.getCol(), value);
     }
 
     public int getBoxNumberForIndexes(int rowIndex, int colIndex) {

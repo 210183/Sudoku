@@ -1,23 +1,26 @@
 package pl.lodz.p.pl;
 
 import java.util.Arrays;
+import java.util.List;
 
+import static pl.lodz.p.pl.HelperMethods.createTwoDimensionalList;
 import static pl.lodz.p.pl.SudokuConstants.boardSize;
 
 public class SudokuBox {
     private static final int boxSize = 3;
-    private SudokuField[][] values = new SudokuField[boxSize][boxSize];
+    private List<FixedList> values = createTwoDimensionalList(boxSize, boxSize);
+    //private SudokuField[][] values = new SudokuField[boxSize][boxSize];
 
     public SudokuBox() {
         for (int i = 0; i < boxSize; i++) {
             for (int j = 0; j < boxSize; j++) {
-                values[i][j] = new SudokuField(0);
+                values.get(i).set(j, new SudokuField(0));
             }
         }
     }
 
     public void setValue(int rowIndex, int columnIndex, int value) {
-        values[rowIndex][columnIndex].setValue(value);
+        values.get(rowIndex).get(columnIndex).setValue(value);
     }
 
 //    public boolean verify() {
@@ -41,7 +44,7 @@ public class SudokuBox {
     public boolean verify(int value) {
         for (int i = 0; i < boxSize; i++) {
             for (int j = 0; j < boxSize; j++) {
-                if (values[i][j].getValue() == value) {
+                if (values.get(i).get(j).getValue() == value) {
                     return false;
                 }
             }
