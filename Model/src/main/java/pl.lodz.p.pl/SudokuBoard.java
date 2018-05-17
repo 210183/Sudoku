@@ -190,4 +190,15 @@ public class SudokuBoard implements Serializable{
                 .add("boxes", boxes)
                 .toString();
     }
+
+    public SudokuBoard deepCopy(){
+        SudokuBoard newBoard = new SudokuBoard();
+        for(int i=0; i<SudokuConstants.boardSize; i++) {
+            for(int j=0; j<SudokuConstants.boardSize; j++) {
+                newBoard.setBoardValueAt(i,j,board.get(i).get(j).getValue());
+            }
+        }
+        return newBoard;
+    }
+
 }
