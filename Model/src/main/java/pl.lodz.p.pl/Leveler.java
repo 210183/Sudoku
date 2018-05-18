@@ -27,11 +27,11 @@ public class Leveler {
     public Integer getEmptyBoxesNumber(DifficultyLevel level) {
 
         if(level == DifficultyLevel.Easy)
-            return 15;
+            return 35;
         if(level == DifficultyLevel.Medium)
-            return 30;
+            return 43;
         if(level == DifficultyLevel.Hard)
-            return 45;
+            return 50;
         return null;
     }
 

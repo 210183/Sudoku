@@ -1,16 +1,25 @@
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 import pl.lodz.p.pl.BacktrackingSudokuSolver;
 import pl.lodz.p.pl.SudokuBoard;
+import pl.lodz.p.pl.SudokuConstants;
 import pl.lodz.p.pl.SudokuField;
+import borderPainter.BoxBordersPainter;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Observable;
 import java.util.ResourceBundle;
 
 public class SudokuBoardController implements Initializable {
@@ -19,38 +28,43 @@ public class SudokuBoardController implements Initializable {
 
     @FXML
     SudokuBoard gameBoard = new SudokuBoard();
-
-    EventHandler<ActionEvent> chooseNumberMethod  = SudokuBoardController::chooseNumber;
-    EventHandler<ActionEvent> changeNumberMethod  = SudokuBoardController::changeNumber;
-
     @FXML
     GridPane NumbersPane;
     @FXML
     GridPane BoardPane;
 
+    ArrayList<Button> boardButtons  = new ArrayList<>();
+
+    EventHandler<ActionEvent> chooseNumberMethod  = this::chooseNumber;
+    EventHandler<ActionEvent> changeNumberMethod  = this::changeNumber;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         for (Integer i = 0; i < 9; i++) {
             Integer buttonText = i+1;
-            NumbersPane.add(createButton(buttonText.toString() , chooseNumberMethod), i, 0);
+            Button button = createButton(buttonText.toString() , chooseNumberMethod);
+            NumbersPane.add(button, i, 0);
         }
     }
-
 
     private Button createButton(String text, EventHandler<ActionEvent> e) {
         Button button = new Button(text);
         button.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         button.setOnAction(e);
+        setDefaultStyle(button);
         return button;
     }
 
     @FXML
-    public static void chooseNumber(ActionEvent event){
+    private void chooseNumber(ActionEvent event){
+        Integer oldNumber = currentNumber;
+        setDefaultStyle((Button)NumbersPane.getChildren().get(oldNumber-1));
+        ((Button)event.getSource()).setStyle("-fx-border-color: #2b0c5a; -fx-border-width: 2px;");
         currentNumber = Integer.parseInt(((Button)event.getSource()).getText());
     }
 
     @FXML
-    public static void changeNumber(ActionEvent event){
+    private void changeNumber(ActionEvent event){
         ((Button)event.getSource()).setText(currentNumber.toString());
 }
 
@@ -72,8 +86,11 @@ public class SudokuBoardController implements Initializable {
                     }
                 });
                 BoardPane.add(b, j, i);
+                boardButtons.add(b);
             }
         }
+        BoxBordersPainter painter = new BoxBordersPainter();
+        painter.drawBoxBorders(boardButtons);
     }
 
     public void initData(SudokuBoard sudokuBoard) {
@@ -81,11 +98,18 @@ public class SudokuBoardController implements Initializable {
         showBoard();
     }
 
-    public boolean isFieldZero(SudokuField field) {
+    private boolean isFieldZero(SudokuField field) {
         if(field.getValue() == 0)
             return true;
         else
             return false;
     }
+
+    private void setDefaultStyle(Button button)
+    {
+        button.setStyle("-fx-border-color: #2b0c5a; -fx-border-width: 1px;");
+    }
+
+
 
 }
