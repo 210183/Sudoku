@@ -12,9 +12,9 @@ import static pl.lodz.p.pl.HelperMethods.*;
 public class SudokuBoard implements Serializable{
 
     private List<FixedList> board = createTwoDimensionalList(boardSize, boardSize);
-    private List<SudokuRow> rows = Arrays.asList(new SudokuRow[boardSize]);
-    private List<SudokuColumn> columns = Arrays.asList(new SudokuColumn[boardSize]);
-    private List<SudokuBox> boxes = Arrays.asList(new SudokuBox[boardSize]);
+//    private List<SudokuRow> rows = Arrays.asList(new SudokuRow[boardSize]);
+//    private List<SudokuColumn> columns = Arrays.asList(new SudokuColumn[boardSize]);
+//    private List<SudokuBox> boxes = Arrays.asList(new SudokuBox[boardSize]);
    // private SudokuField[][] board = new SudokuField[boardSize][boardSize];
    // private SudokuRow[] rows = new SudokuRow[boardSize];
    // private SudokuColumn[] columns = new SudokuColumn[boardSize];
@@ -23,9 +23,9 @@ public class SudokuBoard implements Serializable{
     public SudokuBoard() {
         // init SudokuField
         for (int i = 0; i < boardSize; i++) {
-            rows.set(i, new SudokuRow());
-            columns.set(i, new SudokuColumn());
-            boxes.set(i, new SudokuBox());
+//            rows.set(i, new SudokuRow());
+//            columns.set(i, new SudokuColumn());
+//            boxes.set(i, new SudokuBox());
             for (int j = 0; j < boardSize; j++) {
                 board.get(i).set(j, new SudokuField(0));
             }
@@ -56,9 +56,9 @@ public class SudokuBoard implements Serializable{
         if (isFieldValueInBounds(newValue)) {
             if (isIndexInBounds(rowIndex) && isIndexInBounds(columnIndex)) {
                 board.get(rowIndex).get(columnIndex).setValue(newValue);
-                rows.get(rowIndex).setValue(columnIndex, newValue);
-                columns.get(columnIndex).setValue(rowIndex, newValue);
-                setBoxValueForIndexes(rowIndex, columnIndex, newValue);
+//                rows.get(rowIndex).setValue(columnIndex, newValue);
+//                columns.get(columnIndex).setValue(rowIndex, newValue);
+//                setBoxValueForIndexes(rowIndex, columnIndex, newValue);
             } else {
                 throw new IllegalArgumentException("Bad index");
             }
@@ -97,10 +97,9 @@ public class SudokuBoard implements Serializable{
     public boolean isValid(final BoardIndex boardIndex, int value) {
         int row = boardIndex.row;
         int col = boardIndex.col;
-        if (columns.get(col).verify(value)) {
-            if (rows.get(row).verify(value)) {
-                int boxIndex = getBoxNumberForIndexes(row, col);
-                if (boxes.get(boxIndex).verify(value)) {
+        if (getColumn(col).verify(value)) {
+            if (getRow(row).verify(value)) {
+                if (getBox((row/3)*3, (col/3)*3).verify(value)) {
                     return true;
                 } else {
                     return false;
@@ -144,21 +143,53 @@ public class SudokuBoard implements Serializable{
         return next;
     }
 
-    public BoxIndex getBoxIndexForIndexes(int rowIndex, int colIndex) {
-        int boxRowIndex = rowIndex % 3;
-        int boxColumnIndex = colIndex % 3;
-        return new BoxIndex(boxRowIndex, boxColumnIndex);
+//    public BoxIndex getBoxIndexForIndexes(int rowIndex, int colIndex) {
+//        int boxRowIndex = rowIndex % 3;
+//        int boxColumnIndex = colIndex % 3;
+//        return new BoxIndex(boxRowIndex, boxColumnIndex);
+//    }
+
+    public SudokuBox getBox(int rowIndex, int colIndex) {
+        if(rowIndex > SudokuConstants.boardSize - SudokuConstants.boxSize)
+        {
+            throw new IllegalArgumentException("Cannot create box with that starting index");
+        }
+        if(colIndex > SudokuConstants.boardSize - SudokuConstants.boxSize)
+        {
+            throw new IllegalArgumentException("Cannot create box with that starting index");
+        }
+        SudokuBox box = new SudokuBox();
+        for (int i=0; i<SudokuConstants.boxSize; i++) {
+            for (int j=0; j<SudokuConstants.boxSize; j++) {
+                box.setValue(i, j, board.get(rowIndex + i).get(colIndex + j).getValue());
+            }
+        }
+        return box;
+    }
+    public SudokuRow getRow(int rowIndex) {
+        SudokuRow row = new SudokuRow();
+        for (int i=0; i<SudokuConstants.boardSize; i++) {
+            row.setValue(i, board.get(rowIndex).get(i).getValue());
+        }
+        return row;
+    }
+    public SudokuColumn getColumn(int colIndex) {
+        SudokuColumn col = new SudokuColumn();
+        for (int i=0; i<SudokuConstants.boardSize; i++) {
+            col.setValue(i, board.get(i).get(colIndex).getValue());
+        }
+        return col;
     }
 
-    private void setBoxValueForIndexes(int rowIndex, int colIndex, int value) {
-        int boxNumber = getBoxNumberForIndexes(rowIndex, colIndex);
-        BoxIndex boxIndex = getBoxIndexForIndexes(rowIndex, colIndex);
-        boxes.get(boxNumber).setValue(boxIndex.getRow(), boxIndex.getCol(), value);
-    }
-
-    public int getBoxNumberForIndexes(int rowIndex, int colIndex) {
-        return colIndex / 3 + (rowIndex / 3) * 3;
-    }
+//    private void setBoxValueForIndexes(int rowIndex, int colIndex, int value) {
+//        int boxNumber = getBoxNumberForIndexes(rowIndex, colIndex);
+//        BoxIndex boxIndex = getBoxIndexForIndexes(rowIndex, colIndex);
+//        boxes.get(boxNumber).setValue(boxIndex.getRow(), boxIndex.getCol(), value);
+//    }
+//
+//    public int getBoxNumberForIndexes(int rowIndex, int colIndex) {
+//        return colIndex / 3 + (rowIndex / 3) * 3;
+//    }
 
     @Override
     public boolean equals(final Object o) {
@@ -169,25 +200,19 @@ public class SudokuBoard implements Serializable{
             return false;
         }
         SudokuBoard that = (SudokuBoard) o;
-        return Objects.equals(board, that.board) &&
-                Objects.equals(rows, that.rows) &&
-                Objects.equals(columns, that.columns) &&
-                Objects.equals(boxes, that.boxes);
+        return Objects.equals(board, that.board);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(board, rows, columns, boxes);
+        return Objects.hash(board);
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("board", board)
-                .add("rows", rows)
-                .add("columns", columns)
-                .add("boxes", boxes)
                 .toString();
     }
 
