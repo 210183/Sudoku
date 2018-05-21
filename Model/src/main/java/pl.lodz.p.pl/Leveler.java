@@ -20,7 +20,11 @@ public class Leveler {
         }
         Collections.shuffle(availablePairs);
         for (int i =0; i<getEmptyBoxesNumber(level); i++) {
-            board.setBoardValueAt(availablePairs.get(i)[0],availablePairs.get(i)[1],0);
+            int row, col;
+            row = availablePairs.get(i)[0];
+            col = availablePairs.get(i)[1];
+            board.setBoardValueAt(row,col,0);
+            board.getFieldAtIndexes(row,col).setIsBlocked(false);
         }
     }
 

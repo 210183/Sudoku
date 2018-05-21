@@ -9,9 +9,10 @@ import java.util.Objects;
 
 import static pl.lodz.p.pl.SudokuConstants.*;
 
-public class SudokuField  implements Serializable {
+public class SudokuField  implements Serializable, Comparable<SudokuField> {
 
     private int value;
+    private boolean blocked  = true;
 
     public SudokuField(int value) {
         if (isFieldValueInBounds(value)) {
@@ -31,6 +32,14 @@ public class SudokuField  implements Serializable {
         } else {
             throw new IllegalArgumentException("Invalid argument");
         }
+    }
+
+    public void setIsBlocked(boolean b) {
+        blocked = b;
+    }
+
+    public boolean IsBlocked() {
+        return blocked;
     }
 
     @Override
@@ -57,4 +66,10 @@ public class SudokuField  implements Serializable {
                 .add("value", value)
                 .toString();
     }
+
+    @Override
+    public int compareTo(SudokuField o) {
+        return Integer.compare(this.value, o.getValue());
+    }
+
 }

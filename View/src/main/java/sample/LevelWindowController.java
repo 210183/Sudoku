@@ -4,15 +4,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import pl.lodz.p.pl.BacktrackingSudokuSolver;
 import pl.lodz.p.pl.DifficultyLevel;
 import pl.lodz.p.pl.Leveler;
 import pl.lodz.p.pl.SudokuBoard;
 
-import javax.swing.*;
 import java.io.IOException;
 import java.net.URL;
 
@@ -53,7 +50,7 @@ public class LevelWindowController {
 
         BacktrackingSudokuSolver solver = new BacktrackingSudokuSolver();
         solver.solve(fullBoard);
-        gameBoard = fullBoard.deepCopy();
+        gameBoard = fullBoard.clone();
         new Leveler().initializeBoardLevel(gameBoard, level);
 
         SudokuBoardController boardController = loader.getController();

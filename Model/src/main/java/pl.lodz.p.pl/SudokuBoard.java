@@ -5,11 +5,12 @@ import com.google.common.base.MoreObjects;
 import javax.swing.*;
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLongArray;
 
 import static pl.lodz.p.pl.SudokuConstants.*;
 import static pl.lodz.p.pl.HelperMethods.*;
 
-public class SudokuBoard implements Serializable{
+public class SudokuBoard implements Serializable, Cloneable {
 
     private List<FixedList> board = createTwoDimensionalList(boardSize, boardSize);
 //    private List<SudokuRow> rows = Arrays.asList(new SudokuRow[boardSize]);
@@ -216,7 +217,7 @@ public class SudokuBoard implements Serializable{
                 .toString();
     }
 
-    public SudokuBoard deepCopy(){
+    public SudokuBoard clone(){
         SudokuBoard newBoard = new SudokuBoard();
         for(int i=0; i<SudokuConstants.boardSize; i++) {
             for(int j=0; j<SudokuConstants.boardSize; j++) {
@@ -224,6 +225,10 @@ public class SudokuBoard implements Serializable{
             }
         }
         return newBoard;
+    }
+
+    public SudokuField getFieldAtIndexes(int row, int col){
+        return board.get(row).get(col);
     }
 
 }
