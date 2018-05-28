@@ -12,7 +12,6 @@ import static pl.lodz.p.pl.SudokuConstants.boardSize;
 
 public class SudokuLine  implements Serializable {
     List<SudokuField> values = Arrays.asList(new SudokuField[boardSize]);
-    //private SudokuField[] values = new SudokuField[boardSize];
 
     public SudokuLine() {
         for (int i = 0; i < boardSize; i++) {
@@ -33,22 +32,6 @@ public class SudokuLine  implements Serializable {
             values.get(index).setValue(value);
         }
     }
-
-//    public boolean verify() {
-//        boolean[] isNumberAlreadyFound = new boolean[boardSize + 1]; // from 0 - 9, cause zero means not filled yet
-//        //region check row
-//        Arrays.fill(isNumberAlreadyFound, false);
-//        for (int cell = 0; cell < boardSize; cell++) {
-//            if (values[cell].getValue() != 0) {
-//                if (isNumberAlreadyFound[values[cell].getValue()]) {
-//                    return false;
-//                } else {
-//                    isNumberAlreadyFound[values[cell].getValue()] = true;
-//                }
-//            }
-//        }
-//        return true;
-//    }
 
     public boolean verify(int value) {
         for (int c = 0; c < 9; c++) {

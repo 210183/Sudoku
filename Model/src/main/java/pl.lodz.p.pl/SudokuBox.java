@@ -27,23 +27,6 @@ public class SudokuBox implements Serializable {
         values.get(rowIndex).get(columnIndex).setValue(value);
     }
 
-//    public boolean verify() {
-//        boolean[] isNumberAlreadyFound = new boolean[boardSize + 1]; // from 0 - 9, cause zero means not filled yet
-//        //region check row
-//        Arrays.fill(isNumberAlreadyFound, false);
-//        for (int row = 0; row < boxSize; row++) {
-//            for (int col = 0; col < boxSize; col++) {
-//                if (values[row][col].getValue() != 0) {
-//                    if (isNumberAlreadyFound[values[row][col].getValue()]) {
-//                        return false;
-//                    } else {
-//                        isNumberAlreadyFound[values[row][col].getValue()] = true;
-//                    }
-//                }
-//            }
-//        }
-//        return true;
-//    }
 
     public boolean verify(int value) {
         for (int i = 0; i < boxSize; i++) {

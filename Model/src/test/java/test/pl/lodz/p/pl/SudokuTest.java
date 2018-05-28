@@ -7,6 +7,7 @@ import static pl.lodz.p.pl.SudokuConstants.boardSize;
 
 import org.junit.Test;
 import pl.lodz.p.pl.BacktrackingSudokuSolver;
+import pl.lodz.p.pl.Exceptions.BacktrackingSolverException;
 import pl.lodz.p.pl.FixedList;
 import pl.lodz.p.pl.HelperMethods;
 import pl.lodz.p.pl.HelperMethods.*;
@@ -24,11 +25,19 @@ public class SudokuTest {
     public void CreateProperSudokuBoard_Test() {
         SudokuBoard firstBoard = new SudokuBoard();
         BacktrackingSudokuSolver solver = new BacktrackingSudokuSolver();
-        solver.solve(firstBoard);
+        try {
+            solver.solve(firstBoard);
+        } catch (BacktrackingSolverException e) {
+            e.printStackTrace();
+        }
         validate(firstBoard);
 
         SudokuBoard secondBoard = new SudokuBoard();
-        solver.solve(secondBoard);
+        try {
+            solver.solve(secondBoard);
+        } catch (BacktrackingSolverException e) {
+            e.printStackTrace();
+        }
         validate(secondBoard);
         assert (!Equals(firstBoard.getBoard(), secondBoard.getBoard())); //should randomize two different boards
     }
@@ -38,10 +47,15 @@ public class SudokuTest {
     {
         SudokuBoard firstBoard = new SudokuBoard();
         BacktrackingSudokuSolver solver = new BacktrackingSudokuSolver();
-        solver.solve(firstBoard);
-        firstBoard.consoleShow();
+        try {
+            solver.solve(firstBoard);
+            assertTrue(true);
+        } catch (BacktrackingSolverException e) {
+            e.printStackTrace();
+        }
+        //firstBoard.consoleShow();
         //if execution reached assert below, assuming it;s ok
-        assertTrue(true);
+
     }
 
     @Test

@@ -17,6 +17,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.converter.NumberStringConverter;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 import pl.lodz.p.pl.BoardValidator;
 import pl.lodz.p.pl.Dao.FileSudokuBoardDao;
 import pl.lodz.p.pl.Dao.SudokuBoardDaoFactory;
@@ -39,6 +41,7 @@ import static javafx.beans.binding.Bindings.bindBidirectional;
 public class SudokuBoardController implements Initializable {
 
     static Integer currentNumber = 1;
+    Logger logger;
 
     @FXML
     SudokuBoard gameBoard = new SudokuBoard();
@@ -51,6 +54,12 @@ public class SudokuBoardController implements Initializable {
 
     EventHandler<ActionEvent> chooseNumberMethod = this::chooseNumber;
     EventHandler<ActionEvent> changeNumberMethod = this::changeNumber;
+
+    public void initData(SudokuBoard playBoard, Logger logger) {
+        gameBoard = playBoard;
+        this.logger = logger;
+        showBoard();
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -87,9 +96,6 @@ public class SudokuBoardController implements Initializable {
         for (int i = 0; i < SudokuConstants.boardSize; i++) {
             for (int j = 0; j < SudokuConstants.boardSize; j++) {
                 SudokuField field = gameBoard.getBoard().get(i).get(j);
-//                String textForButton = ((Integer) field.getValue()).toString();
-//                if (isFieldZero(field))
-//                    textForButton = "";
 
                 Button b = createButton(null, changeNumberMethod);
                 b.setDisable(field.IsBlocked());
@@ -113,10 +119,7 @@ public class SudokuBoardController implements Initializable {
         painter.drawBoxBorders(boardButtons);
     }
 
-    public void initData(SudokuBoard playBoard) {
-        gameBoard = playBoard;
-        showBoard();
-    }
+
 
     private boolean isFieldZero(SudokuField field) {
         if (field.getValue() == 0)
@@ -139,23 +142,7 @@ public class SudokuBoardController implements Initializable {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Results");
         alert.setHeaderText(null);
-//
-//        //Saving buttons state
-//        for(int i =0; i < SudokuConstants.boardSize; i++) {
-//            for(int j =0; j < SudokuConstants.boardSize; j++){
-//                if(!gameBoard.getFieldAtIndexes(i, j).IsBlocked()){
-//                    String textBox = getButton(i,j).getText();
-//                    if(textBox == ""){
-//                        result = false;
-//                        alert.setContentText("There are still some empty fields!");
-//                        alert.showAndWait();
-//                        return false;
-//                    }
-//                    Integer value = Integer.parseInt(textBox);
-//                    gameBoard.setBoardValueAt(i,j, value);
-//                }
-//            }
-//        }
+
         result = Bv.validate(gameBoard);
         if(result) {
             alert.setContentText("You win!!!");
@@ -176,12 +163,16 @@ public class SudokuBoardController implements Initializable {
     }
 
     @FXML
-    private void saveGame() throws IOException {
+    private void saveGame()  {
         String filePath = chooseFile();
         SudokuBoardDaoFactory factory = new SudokuBoardDaoFactory();
         FileSudokuBoardDao newDao = factory.getFileDao(filePath);
         //newDao.write(prepareBoardToSave(gameBoard));
-        newDao.write(gameBoard);
+        try {
+            newDao.write(gameBoard);
+        } catch (IOException e) {
+            logger.log(Level.ERROR, e.getStackTrace().toString());
+        }
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Saved");
@@ -190,52 +181,24 @@ public class SudokuBoardController implements Initializable {
         alert.showAndWait();
     }
     @FXML
-    private void openGame() throws IOException, ClassNotFoundException {
+    private void openGame() {
         String filePath = chooseFile();
         SudokuBoardDaoFactory factory = new SudokuBoardDaoFactory();
         FileSudokuBoardDao newDao = factory.getFileDao(filePath);
-        gameBoard = newDao.read();
-//        for(int i = 0; i< boardButtons.size()- 1; i++) {
-//            boardButtons.remove(i);
-//        }
+        try {
+            gameBoard = newDao.read();
+        } catch (IOException e) {
+            logger.log(Level.ERROR, e.getStackTrace().toString());
+        } catch (ClassNotFoundException e) {
+            logger.log(Level.ERROR, e.getStackTrace().toString());
+        }
         BoardPane.getChildren().clear();
         showBoard();
-
-//        for (int i = 0; i < SudokuConstants.boardSize; i++) {
-//            for (int j = 0; j < SudokuConstants.boardSize; j++) {
-//                SudokuField field= gameBoard.getFieldAtIndexes(i, j);
-//                String textForButton = ((Integer) field.getValue()).toString();
-//                Button b = getButton(i,j);
-//                b.setDisable(field.IsBlocked());
-//                if(isFieldZero(field))
-//                    textForButton = "";
-//                b.setText(textForButton);
-//                }
-//            }
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Open");
         alert.setHeaderText(null);
         alert.setContentText("Done!");
         alert.showAndWait();
-    }
-
-
-    private SudokuBoard prepareBoardToSave(SudokuBoard board) {
-        Integer value =0;
-        for (int i = 0; i < SudokuConstants.boardSize; i++) {
-            for (int j = 0; j < SudokuConstants.boardSize; j++) {
-                if (!board.getFieldAtIndexes(i, j).IsBlocked()) {
-                    String textBox = getButton(i, j).getText();
-                    if (textBox == "") {
-                        value = 0;
-                    } else {
-                        value = Integer.parseInt(textBox);
-                    }
-                    board.setBoardValueAt(i, j, value);
-                }
-            }
-        }
-        return board;
     }
 }

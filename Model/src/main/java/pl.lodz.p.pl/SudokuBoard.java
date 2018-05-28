@@ -1,6 +1,8 @@
 package pl.lodz.p.pl;
 
 import com.google.common.base.MoreObjects;
+import pl.lodz.p.pl.Exceptions.InvalidIndexException;
+import pl.lodz.p.pl.Exceptions.InvalidValueException;
 
 import javax.swing.*;
 import java.io.Serializable;
@@ -100,7 +102,13 @@ public class SudokuBoard implements Serializable, Cloneable {
         int col = boardIndex.col;
         if (getColumn(col).verify(value)) {
             if (getRow(row).verify(value)) {
-                if (getBox((row/3)*3, (col/3)*3).verify(value)) {
+                SudokuBox newBox = new SudokuBox();
+                try {
+                    newBox = getBox((row / 3) * 3, (col / 3) * 3);
+                }catch(IllegalArgumentException e) {
+                    throw new InvalidIndexException("Index is invalid", e);
+                }
+                if (newBox.verify(value)) {
                     return true;
                 } else {
                     return false;
@@ -221,7 +229,11 @@ public class SudokuBoard implements Serializable, Cloneable {
         SudokuBoard newBoard = new SudokuBoard();
         for(int i=0; i<SudokuConstants.boardSize; i++) {
             for(int j=0; j<SudokuConstants.boardSize; j++) {
-                newBoard.setBoardValueAt(i,j,board.get(i).get(j).getValue());
+                try{
+                    newBoard.setBoardValueAt(i,j,board.get(i).get(j).getValue());
+                }catch(IllegalArgumentException e){
+                    throw new InvalidValueException("Can't set board value", e);
+                }
             }
         }
         return newBoard;

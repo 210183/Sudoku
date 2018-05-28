@@ -14,6 +14,7 @@ public class Main extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("/LevelWindow.fxml"));
         primaryStage.setTitle("Level Window");
         primaryStage.setScene(new Scene(root));
+
         primaryStage.show();
     }
 

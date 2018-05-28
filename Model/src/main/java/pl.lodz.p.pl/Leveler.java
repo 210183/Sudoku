@@ -1,5 +1,7 @@
 package pl.lodz.p.pl;
 
+import pl.lodz.p.pl.Exceptions.InvalidIndexException;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,7 +25,11 @@ public class Leveler {
             int row, col;
             row = availablePairs.get(i)[0];
             col = availablePairs.get(i)[1];
-            board.setBoardValueAt(row,col,0);
+            try {
+                board.setBoardValueAt(row, col, 0);
+            }catch(IllegalArgumentException e) {
+                throw new InvalidIndexException("Can't set board value", e);
+            }
             board.getFieldAtIndexes(row,col).setIsBlocked(false);
         }
     }
