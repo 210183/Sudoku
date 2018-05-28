@@ -4,6 +4,7 @@ import com.google.common.base.MoreObjects;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import pl.lodz.p.pl.Exceptions.InvalidValueException;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -21,11 +22,7 @@ public class SudokuField  implements Serializable, Comparable<SudokuField> {
     transient private IntegerProperty value;
 
     public SudokuField(int value) {
-        if (isFieldValueInBounds(value)) {
-            this.value = new SimpleIntegerProperty(value);
-        } else {
-            throw new IllegalArgumentException("Invalid value");
-        }
+        setValue(value);
     }
 
     public IntegerProperty getProperty() {
@@ -40,7 +37,7 @@ public class SudokuField  implements Serializable, Comparable<SudokuField> {
         if (isFieldValueInBounds(value)) {
             this.value.setValue(value);
         } else {
-            throw new IllegalArgumentException("Invalid argument");
+            throw new InvalidValueException("Invalid value: " + Integer.toString(value));
         }
     }
 
@@ -92,7 +89,4 @@ public class SudokuField  implements Serializable, Comparable<SudokuField> {
         int x = in.readInt();
         value = new SimpleIntegerProperty(x);
     }
-
-
-
 }

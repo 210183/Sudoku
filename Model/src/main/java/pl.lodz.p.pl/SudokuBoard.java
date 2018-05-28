@@ -1,6 +1,7 @@
 package pl.lodz.p.pl;
 
 import com.google.common.base.MoreObjects;
+import pl.lodz.p.pl.Exceptions.BoardException;
 import pl.lodz.p.pl.Exceptions.InvalidIndexException;
 import pl.lodz.p.pl.Exceptions.InvalidValueException;
 
@@ -15,25 +16,15 @@ import static pl.lodz.p.pl.HelperMethods.*;
 public class SudokuBoard implements Serializable, Cloneable {
 
     private List<FixedList> board = createTwoDimensionalList(boardSize, boardSize);
-//    private List<SudokuRow> rows = Arrays.asList(new SudokuRow[boardSize]);
-//    private List<SudokuColumn> columns = Arrays.asList(new SudokuColumn[boardSize]);
-//    private List<SudokuBox> boxes = Arrays.asList(new SudokuBox[boardSize]);
-   // private SudokuField[][] board = new SudokuField[boardSize][boardSize];
-   // private SudokuRow[] rows = new SudokuRow[boardSize];
-   // private SudokuColumn[] columns = new SudokuColumn[boardSize];
-   // private SudokuBox[] boxes = new SudokuBox[boardSize];
 
     public SudokuBoard() {
         // init SudokuField
         for (int i = 0; i < boardSize; i++) {
-//            rows.set(i, new SudokuRow());
-//            columns.set(i, new SudokuColumn());
-//            boxes.set(i, new SudokuBox());
+
             for (int j = 0; j < boardSize; j++) {
                 board.get(i).set(j, new SudokuField(0));
             }
         }
-        //
         List<SudokuField> rowValues = new ArrayList<>();
         for (int i = 1; i < boardSize + 1; i++) {
             rowValues.add(new SudokuField(i));
@@ -56,17 +47,16 @@ public class SudokuBoard implements Serializable, Cloneable {
     }
 
     public void setBoardValueAt(int rowIndex, int columnIndex, int newValue) throws IllegalArgumentException {
-        if (isFieldValueInBounds(newValue)) {
-            if (isIndexInBounds(rowIndex) && isIndexInBounds(columnIndex)) {
+        if(isIndexInBounds(rowIndex) && isIndexInBounds(columnIndex)) {
+            try {
                 board.get(rowIndex).get(columnIndex).setValue(newValue);
-//                rows.get(rowIndex).setValue(columnIndex, newValue);
-//                columns.get(columnIndex).setValue(rowIndex, newValue);
-//                setBoxValueForIndexes(rowIndex, columnIndex, newValue);
-            } else {
-                throw new IllegalArgumentException("Bad index");
             }
-        } else {
-            throw new IllegalArgumentException("Wrong value to set");
+            catch(InvalidValueException ex) {
+                throw new BoardException("Cannot set this value.", ex);
+            }
+        }
+        else {
+            throw new BoardException("Cannot set value at given index: " + Integer.toString(rowIndex) + ", " + Integer.toString(columnIndex));
         }
     }
 
@@ -189,16 +179,6 @@ public class SudokuBoard implements Serializable, Cloneable {
         }
         return col;
     }
-
-//    private void setBoxValueForIndexes(int rowIndex, int colIndex, int value) {
-//        int boxNumber = getBoxNumberForIndexes(rowIndex, colIndex);
-//        BoxIndex boxIndex = getBoxIndexForIndexes(rowIndex, colIndex);
-//        boxes.get(boxNumber).setValue(boxIndex.getRow(), boxIndex.getCol(), value);
-//    }
-//
-//    public int getBoxNumberForIndexes(int rowIndex, int colIndex) {
-//        return colIndex / 3 + (rowIndex / 3) * 3;
-//    }
 
     @Override
     public boolean equals(final Object o) {

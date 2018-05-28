@@ -64,14 +64,12 @@ public class LevelWindowController implements Initializable {
 
     public void createWindow(DifficultyLevel level ) throws IOException {
 
-
         URL url = getClass().getResource("/SudokuBoardWindow.fxml");
 
         Stage primaryStage = new Stage();
         FXMLLoader loader = new FXMLLoader(url);
 
         Parent root = loader.load();
-
 
         BacktrackingSudokuSolver solver = new BacktrackingSudokuSolver();
         try {
@@ -85,12 +83,11 @@ public class LevelWindowController implements Initializable {
         }catch(InvalidValueException e){
             logger.log(Level.ERROR, e.getStackTrace().toString());
         }
-        try{
+        try {
             new Leveler().initializeBoardLevel(gameBoard, level);
         }catch(InvalidIndexException e){
             logger.log(Level.ERROR, e.getStackTrace().toString());
         }
-
 
         SudokuBoardController boardController = loader.getController();
         boardController.initData(gameBoard, logger);

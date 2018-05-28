@@ -13,7 +13,6 @@ import static pl.lodz.p.pl.SudokuConstants.boardSize;
 public class SudokuBox implements Serializable {
     private static final int boxSize = 3;
     private List<FixedList> values = createTwoDimensionalList(boxSize, boxSize);
-    //private SudokuField[][] values = new SudokuField[boxSize][boxSize];
 
     public SudokuBox() {
         for (int i = 0; i < boxSize; i++) {
