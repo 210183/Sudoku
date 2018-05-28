@@ -16,6 +16,7 @@ import borderPainter.BoxBordersPainter;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.util.converter.NumberStringConverter;
 import pl.lodz.p.pl.BoardValidator;
 import pl.lodz.p.pl.Dao.FileSudokuBoardDao;
 import pl.lodz.p.pl.Dao.SudokuBoardDaoFactory;
@@ -26,10 +27,14 @@ import pl.lodz.p.pl.SudokuField;
 import java.beans.IntrospectionException;
 import java.io.File;
 import java.io.IOException;
+import java.lang.invoke.ConstantCallSite;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.ResourceBundle;
+
+import static javafx.beans.binding.Bindings.bindBidirectional;
+
 
 public class SudokuBoardController implements Initializable {
 
@@ -79,13 +84,14 @@ public class SudokuBoardController implements Initializable {
     }
 
     private void showBoard() {
-        for (int i = 0; i < gameBoard.getBoard().size(); i++) {
-            for (int j = 0; j < gameBoard.getBoard().get(0).size(); j++) {
+        for (int i = 0; i < SudokuConstants.boardSize; i++) {
+            for (int j = 0; j < SudokuConstants.boardSize; j++) {
                 SudokuField field = gameBoard.getBoard().get(i).get(j);
-                String textForButton = ((Integer) field.getValue()).toString();
-                if (isFieldZero(field))
-                    textForButton = "";
-                Button b = createButton(textForButton, changeNumberMethod);
+//                String textForButton = ((Integer) field.getValue()).toString();
+//                if (isFieldZero(field))
+//                    textForButton = "";
+
+                Button b = createButton(null, changeNumberMethod);
                 b.setDisable(field.IsBlocked());
                 b.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
@@ -96,6 +102,9 @@ public class SudokuBoardController implements Initializable {
                         }
                     }
                 });
+                bindBidirectional(b.textProperty(), field.getProperty(), new NumberStringConverter());
+                if(Integer.parseInt(b.getText()) == 0)
+                    b.setText("");
                 BoardPane.add(b, j, i);
                 boardButtons.add(b);
             }
@@ -130,23 +139,23 @@ public class SudokuBoardController implements Initializable {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Results");
         alert.setHeaderText(null);
-
-        //Saving buttons state
-        for(int i =0; i < SudokuConstants.boardSize; i++) {
-            for(int j =0; j < SudokuConstants.boardSize; j++){
-                if(!gameBoard.getFieldAtIndexes(i, j).IsBlocked()){
-                    String textBox = getButton(i,j).getText();
-                    if(textBox == ""){
-                        result = false;
-                        alert.setContentText("There are still some empty fields!");
-                        alert.showAndWait();
-                        return false;
-                    }
-                    Integer value = Integer.parseInt(textBox);
-                    gameBoard.setBoardValueAt(i,j, value);
-                }
-            }
-        }
+//
+//        //Saving buttons state
+//        for(int i =0; i < SudokuConstants.boardSize; i++) {
+//            for(int j =0; j < SudokuConstants.boardSize; j++){
+//                if(!gameBoard.getFieldAtIndexes(i, j).IsBlocked()){
+//                    String textBox = getButton(i,j).getText();
+//                    if(textBox == ""){
+//                        result = false;
+//                        alert.setContentText("There are still some empty fields!");
+//                        alert.showAndWait();
+//                        return false;
+//                    }
+//                    Integer value = Integer.parseInt(textBox);
+//                    gameBoard.setBoardValueAt(i,j, value);
+//                }
+//            }
+//        }
         result = Bv.validate(gameBoard);
         if(result) {
             alert.setContentText("You win!!!");
@@ -171,7 +180,8 @@ public class SudokuBoardController implements Initializable {
         String filePath = chooseFile();
         SudokuBoardDaoFactory factory = new SudokuBoardDaoFactory();
         FileSudokuBoardDao newDao = factory.getFileDao(filePath);
-        newDao.write(prepareBoardToSave(gameBoard));
+        //newDao.write(prepareBoardToSave(gameBoard));
+        newDao.write(gameBoard);
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Saved");
@@ -185,18 +195,23 @@ public class SudokuBoardController implements Initializable {
         SudokuBoardDaoFactory factory = new SudokuBoardDaoFactory();
         FileSudokuBoardDao newDao = factory.getFileDao(filePath);
         gameBoard = newDao.read();
-        
-        for (int i = 0; i < SudokuConstants.boardSize; i++) {
-            for (int j = 0; j < SudokuConstants.boardSize; j++) {
-                SudokuField field= gameBoard.getFieldAtIndexes(i, j);
-                String textForButton = ((Integer) field.getValue()).toString();
-                Button b = getButton(i,j);
-                b.setDisable(field.IsBlocked());
-                if(isFieldZero(field))
-                    textForButton = "";
-                b.setText(textForButton);
-                }
-            }
+//        for(int i = 0; i< boardButtons.size()- 1; i++) {
+//            boardButtons.remove(i);
+//        }
+        BoardPane.getChildren().clear();
+        showBoard();
+
+//        for (int i = 0; i < SudokuConstants.boardSize; i++) {
+//            for (int j = 0; j < SudokuConstants.boardSize; j++) {
+//                SudokuField field= gameBoard.getFieldAtIndexes(i, j);
+//                String textForButton = ((Integer) field.getValue()).toString();
+//                Button b = getButton(i,j);
+//                b.setDisable(field.IsBlocked());
+//                if(isFieldZero(field))
+//                    textForButton = "";
+//                b.setText(textForButton);
+//                }
+//            }
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Open");
