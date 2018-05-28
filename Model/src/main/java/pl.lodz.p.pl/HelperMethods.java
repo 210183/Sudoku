@@ -1,5 +1,9 @@
 package pl.lodz.p.pl;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,5 +29,14 @@ public class HelperMethods {
             }
         }
         return true;
+    }
+    public static void LogException(Exception ex, Logger logger) {
+        logger.log(Level.ERROR, ex.getClass().toString() +"\r\n"+ " Message = "  + ex.getMessage());
+        Throwable throwable = ex.getCause();
+        while(throwable != null)
+        {
+            logger.log(Level.ERROR, "   Caused: " + throwable.getClass().toString() +"\r\n"+" Message = "  + throwable.getMessage());
+            throwable = throwable.getCause();
+        }
     }
 }

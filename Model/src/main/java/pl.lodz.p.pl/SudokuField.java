@@ -19,7 +19,7 @@ public class SudokuField  implements Serializable, Comparable<SudokuField> {
 
 
     private boolean blocked  = true;
-    transient private IntegerProperty value;
+    transient private IntegerProperty value = new SimpleIntegerProperty();
 
     public SudokuField(int value) {
         setValue(value);

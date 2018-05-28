@@ -56,7 +56,7 @@ public class SudokuBoard implements Serializable, Cloneable {
             }
         }
         else {
-            throw new BoardException("Cannot set value at given index: " + Integer.toString(rowIndex) + ", " + Integer.toString(columnIndex));
+            throw new InvalidIndexException("Cannot set value at given index: " + Integer.toString(rowIndex) + ", " + Integer.toString(columnIndex));
         }
     }
 
@@ -151,11 +151,11 @@ public class SudokuBoard implements Serializable, Cloneable {
     public SudokuBox getBox(int rowIndex, int colIndex) {
         if(rowIndex > SudokuConstants.boardSize - SudokuConstants.boxSize)
         {
-            throw new IllegalArgumentException("Cannot create box with that starting index");
+            throw new InvalidIndexException("Cannot create box with that starting index");
         }
         if(colIndex > SudokuConstants.boardSize - SudokuConstants.boxSize)
         {
-            throw new IllegalArgumentException("Cannot create box with that starting index");
+            throw new InvalidIndexException("Cannot create box with that starting index");
         }
         SudokuBox box = new SudokuBox();
         for (int i=0; i<SudokuConstants.boxSize; i++) {
@@ -211,8 +211,8 @@ public class SudokuBoard implements Serializable, Cloneable {
             for(int j=0; j<SudokuConstants.boardSize; j++) {
                 try{
                     newBoard.setBoardValueAt(i,j,board.get(i).get(j).getValue());
-                }catch(IllegalArgumentException e){
-                    throw new InvalidValueException("Can't set board value", e);
+                }catch(BoardException e){
+                    throw new BoardException("Problem with board that was cloning too.", e);
                 }
             }
         }

@@ -36,6 +36,7 @@ import java.util.Observable;
 import java.util.ResourceBundle;
 
 import static javafx.beans.binding.Bindings.bindBidirectional;
+import static pl.lodz.p.pl.HelperMethods.LogException;
 
 
 public class SudokuBoardController implements Initializable {
@@ -171,7 +172,7 @@ public class SudokuBoardController implements Initializable {
         try {
             newDao.write(gameBoard);
         } catch (IOException e) {
-            logger.log(Level.ERROR, e.getStackTrace().toString());
+            LogException(e, logger);
         }
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -188,9 +189,9 @@ public class SudokuBoardController implements Initializable {
         try {
             gameBoard = newDao.read();
         } catch (IOException e) {
-            logger.log(Level.ERROR, e.getStackTrace().toString());
+            LogException(e, logger);
         } catch (ClassNotFoundException e) {
-            logger.log(Level.ERROR, e.getStackTrace().toString());
+            LogException(e, logger);
         }
         BoardPane.getChildren().clear();
         showBoard();

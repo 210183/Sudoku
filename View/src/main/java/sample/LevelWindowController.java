@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import static pl.lodz.p.pl.HelperMethods.LogException;
 
 
 public class LevelWindowController implements Initializable {
@@ -76,17 +77,17 @@ public class LevelWindowController implements Initializable {
             solver.solve(fullBoard);
         } catch (BacktrackingSolverException e) {
             //LOGGER.info(e.getStackTrace().toString());
-            logger.log(Level.ERROR, e.getStackTrace().toString());
+            LogException(e, logger);
         }
         try {
             gameBoard = fullBoard.clone();
         }catch(InvalidValueException e){
-            logger.log(Level.ERROR, e.getStackTrace().toString());
+            LogException(e, logger);
         }
         try {
             new Leveler().initializeBoardLevel(gameBoard, level);
         }catch(InvalidIndexException e){
-            logger.log(Level.ERROR, e.getStackTrace().toString());
+            LogException(e, logger);
         }
 
         SudokuBoardController boardController = loader.getController();
