@@ -19,10 +19,12 @@ public class SudokuField  implements Serializable, Comparable<SudokuField> {
 
 
     private boolean blocked  = true;
+    private int intValue;
     transient private IntegerProperty value = new SimpleIntegerProperty();
 
     public SudokuField(int value) {
         setValue(value);
+        intValue = value;
     }
 
     public IntegerProperty getProperty() {
@@ -36,6 +38,7 @@ public class SudokuField  implements Serializable, Comparable<SudokuField> {
     public void setValue(int value) {
         if (isFieldValueInBounds(value)) {
             this.value.setValue(value);
+            intValue = value;
         } else {
             throw new InvalidValueException("Invalid value: " + Integer.toString(value));
         }
@@ -60,20 +63,17 @@ public class SudokuField  implements Serializable, Comparable<SudokuField> {
         SudokuField that = (SudokuField) o;
         return value == that.value;
     }
-
     @Override
     public int hashCode() {
 
         return Objects.hash(value);
     }
-
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("value", value)
                 .toString();
     }
-
     @Override
     public int compareTo(SudokuField o) {
         return Integer.compare(this.value.getValue(), o.getValue());

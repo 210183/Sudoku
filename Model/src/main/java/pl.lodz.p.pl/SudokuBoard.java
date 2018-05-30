@@ -142,12 +142,6 @@ public class SudokuBoard implements Serializable, Cloneable {
         return next;
     }
 
-//    public BoxIndex getBoxIndexForIndexes(int rowIndex, int colIndex) {
-//        int boxRowIndex = rowIndex % 3;
-//        int boxColumnIndex = colIndex % 3;
-//        return new BoxIndex(boxRowIndex, boxColumnIndex);
-//    }
-
     public SudokuBox getBox(int rowIndex, int colIndex) {
         if(rowIndex > SudokuConstants.boardSize - SudokuConstants.boxSize)
         {
@@ -180,6 +174,10 @@ public class SudokuBoard implements Serializable, Cloneable {
         return col;
     }
 
+    public SudokuField getFieldAtIndexes(int row, int col){
+        return board.get(row).get(col);
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
@@ -191,13 +189,11 @@ public class SudokuBoard implements Serializable, Cloneable {
         SudokuBoard that = (SudokuBoard) o;
         return Objects.equals(board, that.board);
     }
-
     @Override
     public int hashCode() {
 
         return Objects.hash(board);
     }
-
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
@@ -218,9 +214,4 @@ public class SudokuBoard implements Serializable, Cloneable {
         }
         return newBoard;
     }
-
-    public SudokuField getFieldAtIndexes(int row, int col){
-        return board.get(row).get(col);
-    }
-
 }
