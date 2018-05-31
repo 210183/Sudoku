@@ -23,14 +23,14 @@ public class Field {
     private int value;
 
     @DatabaseField(columnName = "Blocked", canBeNull = false)
-    private boolean changeable;
+    private boolean blocked;
 
-    public boolean isChangeable() {
-        return changeable;
+    public boolean isBlocked() {
+        return blocked;
     }
 
-    public void setChangeable(boolean changeable) {
-        this.changeable = changeable;
+    public void setBlocked(boolean blocked) {
+        this.blocked = blocked;
     }
 
     public Board getBoard() {

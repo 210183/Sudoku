@@ -6,4 +6,9 @@ public class SudokuBoardDaoFactory {
     public FileSudokuBoardDao getFileDao(final String fileName) {
         return new FileSudokuBoardDao(fileName);
     }
+
+    public JdbcSudokuBoardDao getDbDao(String boardName){
+        return new JdbcSudokuBoardDao(boardName);
+    }
+
 }

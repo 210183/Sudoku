@@ -6,6 +6,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
@@ -21,7 +23,10 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 import pl.lodz.p.pl.BoardValidator;
 import pl.lodz.p.pl.Dao.FileSudokuBoardDao;
+import pl.lodz.p.pl.Dao.JdbcSudokuBoardDao;
 import pl.lodz.p.pl.Dao.SudokuBoardDaoFactory;
+import pl.lodz.p.pl.Databse.Board;
+import pl.lodz.p.pl.Databse.DbManager;
 import pl.lodz.p.pl.SudokuBoard;
 import pl.lodz.p.pl.SudokuConstants;
 import pl.lodz.p.pl.SudokuField;
@@ -31,9 +36,8 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.ConstantCallSite;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Observable;
-import java.util.ResourceBundle;
+import java.sql.SQLException;
+import java.util.*;
 
 import static javafx.beans.binding.Bindings.bindBidirectional;
 import static pl.lodz.p.pl.HelperMethods.LogException;
@@ -137,7 +141,7 @@ public class SudokuBoardController implements Initializable {
         return boardButtons.get(row*SudokuConstants.boardSize + col);
     }
     @FXML
-    private boolean validateGameBoard(){
+    private boolean validateGameBoard() {
         BoardValidator Bv = new BoardValidator();
         boolean result = true;
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -164,7 +168,7 @@ public class SudokuBoardController implements Initializable {
     }
 
     @FXML
-    private void saveGame()  {
+    private void saveGame() {
         String filePath = chooseFile();
         SudokuBoardDaoFactory factory = new SudokuBoardDaoFactory();
         FileSudokuBoardDao newDao = factory.getFileDao(filePath);
@@ -180,9 +184,10 @@ public class SudokuBoardController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText("Saved!");
         alert.showAndWait();
+
     }
     @FXML
-    private void openGame() {
+    private void openGame(){
         String filePath = chooseFile();
         SudokuBoardDaoFactory factory = new SudokuBoardDaoFactory();
         FileSudokuBoardDao newDao = factory.getFileDao(filePath);
@@ -202,4 +207,78 @@ public class SudokuBoardController implements Initializable {
         alert.setContentText("Done!");
         alert.showAndWait();
     }
+
+    @FXML
+    private void saveToDb() {
+        TextInputDialog dialog = new TextInputDialog("save");
+        dialog.setTitle("Database save");
+        dialog.setHeaderText("Save to database");
+        dialog.setContentText("Enter name of the save:");
+
+        Optional<String> result = dialog.showAndWait();
+        String boardName = "Default";
+        if(result.isPresent()){
+            boardName = result.get();
+        }
+        SudokuBoardDaoFactory factory = new SudokuBoardDaoFactory();
+        JdbcSudokuBoardDao dbDao = factory.getDbDao(boardName);
+
+        try {
+            dbDao.write(gameBoard);
+        } catch (IOException e) {
+            //TODO::Exception
+        }
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Saved");
+        alert.setHeaderText(null);
+        alert.setContentText("Saved!");
+        alert.showAndWait();
+    }
+
+    @FXML
+    private void openFromDb() {
+        DbManager manager = new DbManager();
+        List<String> boardsList = new ArrayList<>();
+        try {
+             boardsList = manager.selectAllBoards();
+        } catch (SQLException e) {
+            //TODO::Exception
+        } catch (IOException e) {
+            //TODO::Exception
+        }
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(boardsList.get(0), boardsList);
+        dialog.setTitle("Database open");
+        dialog.setHeaderText("Open from database");
+        dialog.setContentText("Choose sudoku board:");
+
+        Optional<String> result = dialog.showAndWait();
+        String boardName = "";
+        if (result.isPresent()) {
+            boardName = result.get();
+        }
+
+        SudokuBoardDaoFactory factory = new SudokuBoardDaoFactory();
+        JdbcSudokuBoardDao dbDao = factory.getDbDao(boardName);
+
+        try {
+            gameBoard = dbDao.read();
+            BoardPane.getChildren().clear();
+            showBoard();
+        } catch (IOException e) {
+            //TODO::Exception
+        } catch (ClassNotFoundException e) {
+            //TODO::Exception
+        }
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Open");
+        alert.setHeaderText(null);
+        alert.setContentText("Done!");
+        alert.showAndWait();
+
+    }
 }
+
+
+

@@ -22,8 +22,10 @@
             <MenuItem mnemonicParsing="false" text="Validate" onAction="#validateGameBoard"/>
             <SeparatorMenuItem mnemonicParsing="false" />
             <MenuItem mnemonicParsing="false" text="Open…" onAction="#openGame" />
-            <SeparatorMenuItem mnemonicParsing="false" />
             <MenuItem mnemonicParsing="false" text="Save As…" onAction="#saveGame"/>
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem mnemonicParsing="false" text="Save to DB" onAction="#saveToDb"/>
+            <MenuItem mnemonicParsing="false" text="Open from DB" onAction="#openFromDb"/>
             <SeparatorMenuItem mnemonicParsing="false" />
           </items>
         </Menu>
