@@ -42,10 +42,10 @@ public class DbManager {
         ConnectionSource connectionSource = new JdbcConnectionSource(databaseUrl);
         Dao<Board, String> boardDao = DaoManager.createDao(connectionSource, Board.class);
 
+        deleteFields(boardName, connectionSource);
         Board board = new Board();
         board.setName(boardName);
         boardDao.createOrUpdate(board);
-        deleteFields(boardName, connectionSource);
         insertFields(boardName, board, sudokuBoard, connectionSource);
         connectionSource.close();
 

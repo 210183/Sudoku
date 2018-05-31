@@ -31,6 +31,11 @@ public class JdbcSudokuBoardDao implements Dao<SudokuBoard>{
     public void write(SudokuBoard obj) throws IOException {
         DbManager manager = new DbManager();
         try {
+            manager.createTables();
+        } catch (SQLException e) {
+            //TODO:Exception
+        }
+        try {
             manager.insertBoardWithFields(boardName, obj);
         } catch (SQLException e) {
             //TODO:Exception
