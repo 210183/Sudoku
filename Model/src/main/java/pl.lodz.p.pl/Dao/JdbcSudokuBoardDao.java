@@ -6,7 +6,7 @@ import pl.lodz.p.pl.SudokuBoard;
 import java.io.IOException;
 import java.sql.SQLException;
 
-public class JdbcSudokuBoardDao implements Dao<SudokuBoard>{
+public class JdbcSudokuBoardDao implements Dao<SudokuBoard>, AutoCloseable{
 
     private String boardName;
 
@@ -18,9 +18,9 @@ public class JdbcSudokuBoardDao implements Dao<SudokuBoard>{
     public SudokuBoard read() throws IOException, ClassNotFoundException {
 
         SudokuBoard newBoard = new SudokuBoard();
-        DbManager manager = new DbManager();
+        //DbManager manager = new DbManager();
         try {
-            newBoard = manager.getSudokuBoard(boardName);
+            newBoard = DbManager.getSudokuBoard(boardName);
         } catch (SQLException e) {
             //TODO:Exception
         }
@@ -29,15 +29,31 @@ public class JdbcSudokuBoardDao implements Dao<SudokuBoard>{
 
     @Override
     public void write(SudokuBoard obj) throws IOException {
-        DbManager manager = new DbManager();
+        //DbManager manager = new DbManager();
         try {
-            manager.createTables();
+            DbManager.createTables();
         } catch (SQLException e) {
             //TODO:Exception
         }
         try {
-            manager.insertBoardWithFields(boardName, obj);
+            DbManager.insertBoardWithFields(boardName, obj);
         } catch (SQLException e) {
+            //TODO:Exception
+        }
+    }
+
+    @Override
+    public void close() throws IOException {
+
+        DbManager.closeConnectionSource();
+
+    }
+
+    @Override
+    public void finalize() {
+        try {
+            close();
+        } catch (IOException e) {
             //TODO:Exception
         }
     }

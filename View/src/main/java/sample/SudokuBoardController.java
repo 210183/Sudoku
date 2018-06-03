@@ -238,10 +238,10 @@ public class SudokuBoardController implements Initializable {
 
     @FXML
     private void openFromDb() {
-        DbManager manager = new DbManager();
+       // DbManager manager = new DbManager();
         List<String> boardsList = new ArrayList<>();
         try {
-             boardsList = manager.selectAllBoards();
+             boardsList = DbManager.selectAllBoards();
         } catch (SQLException e) {
             //TODO::Exception
         } catch (IOException e) {
