@@ -1,6 +1,7 @@
 package pl.lodz.p.pl.Dao;
 
 import pl.lodz.p.pl.Databse.DbManager;
+import pl.lodz.p.pl.Exceptions.DataBaseException;
 import pl.lodz.p.pl.SudokuBoard;
 
 import java.io.IOException;
@@ -15,30 +16,30 @@ public class JdbcSudokuBoardDao implements Dao<SudokuBoard>{
     }
 
     @Override
-    public SudokuBoard read() throws IOException, ClassNotFoundException {
+    public SudokuBoard read() throws IOException, ClassNotFoundException, DataBaseException {
 
         SudokuBoard newBoard = new SudokuBoard();
-        DbManager manager = new DbManager();
+
         try {
-            newBoard = manager.getSudokuBoard(boardName);
+            newBoard = DbManager.getSudokuBoard(boardName);
         } catch (SQLException e) {
-            //TODO:Exception
+            throw new DataBaseException("Error in reading from database");
         }
         return newBoard;
     }
 
     @Override
-    public void write(SudokuBoard obj) throws IOException {
-        DbManager manager = new DbManager();
+    public void write(SudokuBoard obj) throws IOException, DataBaseException {
+
         try {
-            manager.createTables();
+            DbManager.createTables();
         } catch (SQLException e) {
-            //TODO:Exception
+            throw new DataBaseException("Can't create tables");
         }
         try {
-            manager.insertBoardWithFields(boardName, obj);
+            DbManager.insertBoardWithFields(boardName, obj);
         } catch (SQLException e) {
-            //TODO:Exception
+            throw new DataBaseException("Can't add sudoku board to database");
         }
     }
 }

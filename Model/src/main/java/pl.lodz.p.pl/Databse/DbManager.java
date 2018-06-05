@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DbManager {
-    private static String databaseUrl = "jdbc:sqlite:Database";
+    private static String databaseUrl = "jdbc:sqlite:Database.db";
 
     public static void setDbUrl(final String url) {
         databaseUrl = url;

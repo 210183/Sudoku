@@ -27,6 +27,7 @@ import pl.lodz.p.pl.Dao.JdbcSudokuBoardDao;
 import pl.lodz.p.pl.Dao.SudokuBoardDaoFactory;
 import pl.lodz.p.pl.Databse.Board;
 import pl.lodz.p.pl.Databse.DbManager;
+import pl.lodz.p.pl.Exceptions.DataBaseException;
 import pl.lodz.p.pl.SudokuBoard;
 import pl.lodz.p.pl.SudokuConstants;
 import pl.lodz.p.pl.SudokuField;
@@ -226,7 +227,9 @@ public class SudokuBoardController implements Initializable {
         try {
             dbDao.write(gameBoard);
         } catch (IOException e) {
-            //TODO::Exception
+            e.printStackTrace();
+        } catch (DataBaseException e) {
+            e.printStackTrace();
         }
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -243,9 +246,9 @@ public class SudokuBoardController implements Initializable {
         try {
              boardsList = manager.selectAllBoards();
         } catch (SQLException e) {
-            //TODO::Exception
+            LogException(e, logger);
         } catch (IOException e) {
-            //TODO::Exception
+            LogException(e, logger);
         }
         ChoiceDialog<String> dialog = new ChoiceDialog<>(boardsList.get(0), boardsList);
         dialog.setTitle("Database open");
@@ -266,9 +269,11 @@ public class SudokuBoardController implements Initializable {
             BoardPane.getChildren().clear();
             showBoard();
         } catch (IOException e) {
-            //TODO::Exception
+            LogException(e, logger);
         } catch (ClassNotFoundException e) {
-            //TODO::Exception
+            LogException(e, logger);
+        } catch (DataBaseException e) {
+            LogException(e, logger);
         }
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
