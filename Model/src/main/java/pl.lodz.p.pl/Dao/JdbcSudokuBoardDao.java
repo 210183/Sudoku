@@ -7,7 +7,7 @@ import pl.lodz.p.pl.SudokuBoard;
 import java.io.IOException;
 import java.sql.SQLException;
 
-public class JdbcSudokuBoardDao implements Dao<SudokuBoard>{
+public class JdbcSudokuBoardDao implements Dao<SudokuBoard>, AutoCloseable{
 
     private String boardName;
 
@@ -19,7 +19,6 @@ public class JdbcSudokuBoardDao implements Dao<SudokuBoard>{
     public SudokuBoard read() throws IOException, ClassNotFoundException, DataBaseException {
 
         SudokuBoard newBoard = new SudokuBoard();
-
         try {
             newBoard = DbManager.getSudokuBoard(boardName);
         } catch (SQLException e) {
@@ -30,7 +29,6 @@ public class JdbcSudokuBoardDao implements Dao<SudokuBoard>{
 
     @Override
     public void write(SudokuBoard obj) throws IOException, DataBaseException {
-
         try {
             DbManager.createTables();
         } catch (SQLException e) {
@@ -40,6 +38,22 @@ public class JdbcSudokuBoardDao implements Dao<SudokuBoard>{
             DbManager.insertBoardWithFields(boardName, obj);
         } catch (SQLException e) {
             throw new DataBaseException("Can't add sudoku board to database");
+        }
+    }
+
+    @Override
+    public void close() throws IOException {
+
+        DbManager.closeConnectionSource();
+
+    }
+
+    @Override
+    public void finalize() throws DataBaseException{
+        try {
+            close();
+        } catch (IOException e) {
+            throw new DataBaseException("Can't close connection");
         }
     }
 }

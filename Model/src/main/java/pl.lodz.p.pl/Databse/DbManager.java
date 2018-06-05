@@ -25,8 +25,15 @@ public class DbManager {
         return databaseUrl;
     }
 
+    static ConnectionSource connectionSource;
+
+    public static  void closeConnectionSource() throws IOException {
+        connectionSource.close();
+    }
+
+
     public static void createTables() throws SQLException {
-        ConnectionSource connectionSource = new JdbcConnectionSource(databaseUrl);
+         connectionSource = new JdbcConnectionSource(databaseUrl);
 
         TableUtils.createTableIfNotExists(connectionSource, Board.class);
         TableUtils.createTableIfNotExists(connectionSource, Field.class);
@@ -39,14 +46,14 @@ public class DbManager {
     }
 
     public static void insertBoardWithFields(String boardName, SudokuBoard sudokuBoard) throws SQLException, IOException {
-        ConnectionSource connectionSource = new JdbcConnectionSource(databaseUrl);
+         connectionSource = new JdbcConnectionSource(databaseUrl);
         Dao<Board, String> boardDao = DaoManager.createDao(connectionSource, Board.class);
 
-        deleteFields(boardName, connectionSource);
+        deleteFields(boardName);
         Board board = new Board();
         board.setName(boardName);
         boardDao.createOrUpdate(board);
-        insertFields(boardName, board, sudokuBoard, connectionSource);
+        insertFields(boardName, board, sudokuBoard);
         connectionSource.close();
 
     }
@@ -57,11 +64,11 @@ public class DbManager {
         newBoard.setName(boardName);
         boardDao.delete(newBoard);
 
-        deleteFields(boardName, connectionSource);
+        deleteFields(boardName);
 
     }
 
-    public static void deleteFields(String boardName, ConnectionSource connectionSource) throws SQLException {
+    public static void deleteFields(String boardName) throws SQLException {
         Dao<Field, Integer> fieldDao = DaoManager.createDao(connectionSource, Field.class);
         if (fieldDao.query(fieldDao.queryBuilder().where().eq("Board_name", boardName).prepare()) != null) {
             DeleteBuilder<Field, Integer> deleteBuilder = fieldDao.deleteBuilder();
@@ -70,7 +77,7 @@ public class DbManager {
         }
     }
 
-    public static void insertFields(String boardName, Board board, SudokuBoard sudokuBoard,ConnectionSource connectionSource) throws SQLException {
+    public static void insertFields(String boardName, Board board, SudokuBoard sudokuBoard) throws SQLException {
         Dao<Field, Integer> fieldDao = DaoManager.createDao(connectionSource, Field.class);
         for(int i = 0; i<SudokuConstants.boardSize; i++){
             for(int j=0; j<SudokuConstants.boardSize; j++){
